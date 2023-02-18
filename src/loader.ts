@@ -9,7 +9,7 @@ import {
 type CB = (arg: any) => void;
 
 export interface Evaluator {
-  eval(code: string, cb?: CB): void;
+  eval(code: string, cb?: CB): Promise<void>;
 }
 
 export interface Loader {
@@ -58,17 +58,35 @@ export class QuickJSEvaluator implements Evaluator {
     this.eval("globalThis = this;module = {};");
     this.eval(this.content);
     console.log("initialized quickjs evaluator!");
+    setInterval(() => {
+      if (this.vm.runtime.hasPendingJob()) {
+        this.vm.runtime.executePendingJobs();
+      }
+    }, 100);
   }
 
-  eval(code: string, cb?: CB) {
+  async eval(code: string, cb?: CB) {
     const result = this.vm.evalCode(code);
+
     if (result.error) {
       const err = new Error(JSON.stringify(this.vm.dump(result.error)));
       result.error.dispose();
       throw err;
     } else {
+      const p = this.vm.resolvePromise(result.value);
       try {
-        if (cb) cb(this.vm.dump(result.value));
+        const val = await p;
+        if (val.error) {
+          const err = new Error(JSON.stringify(this.vm.dump(val.error)));
+          val.error.dispose();
+          throw err;
+        } else {
+          try {
+            if (cb) cb(this.vm.dump(val.value));
+          } finally {
+            val.value.dispose();
+          }
+        }
       } finally {
         result.value.dispose();
       }

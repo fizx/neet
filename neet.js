@@ -43,7 +43,7 @@ __export(home_exports, {
   serve: () => serve
 });
 module.exports = __toCommonJS(home_exports);
-function serve(req) {
+function serve(_req) {
   return __async(this, null, function* () {
     return {
       status: 200,

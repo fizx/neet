@@ -28,7 +28,7 @@ export class Server {
     };
     try {
       await ev.eval(
-        `module.exports.serve(${JSON.stringify(simple)})`,
+        `module.exports.serve(${JSON.stringify(simple)});`,
         (result) => {
           if (typeof result === "object" && result !== null) {
             const { status, headers, body } = result as {
