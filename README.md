@@ -1,0 +1,1 @@
+[![CI](https://img.shields.io/github/workflow/status/fizx/neet/CI/main?token=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)](https://github.com/<username>/<repo-name>/actions/workflows/ci.yaml)
