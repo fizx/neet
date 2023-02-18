@@ -1,1 +1,1 @@
-[![CI](https://img.shields.io/github/workflow/status/fizx/neet/CI/main?token=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)](https://github.com/fizx/neet/actions/workflows/ci.yaml)
+[![CI](https://img.shields.io/github/actions/workflow/status/fizx/neet/ci.yaml?token=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)](https://github.com/fizx/neet/actions/workflows/ci.yaml)
