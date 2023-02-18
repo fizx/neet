@@ -22,6 +22,9 @@ export interface Fetcher {
 
 export class GithubFetcher implements Fetcher {
   async load(host: string): Promise<string> {
+    if (host.endsWith("neetcode.us")) {
+      host = "fizx-neet.neetcode.us";
+    }
     const leftmost = host.split(".")[0];
     const user = leftmost.split("-")[0];
     const repo = leftmost.split("-")[1];
