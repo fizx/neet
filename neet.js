@@ -47,7 +47,7 @@ function serve(_req) {
   return __async(this, null, function* () {
     return {
       status: 200,
-      body: "Hello, world!"
+      body: "Hello, world! from the inside!"
     };
   });
 }
