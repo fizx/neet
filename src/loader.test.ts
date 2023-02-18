@@ -1,10 +1,10 @@
-import request from "supertest";
-import { app } from "./app";
+import { GithubLoader } from "./loader";
+import * as fs from "fs";
 
-describe("GET /", () => {
-  it('should return "Hello, world!"', async () => {
-    const response = await request(app).get("/");
-    expect(response.status).toBe(200);
-    expect(response.text).toBe("Hello, world!");
+describe("loading self", () => {
+  it("some javascript", async () => {
+    const loader = new GithubLoader();
+    let content = await loader.load("fizx-neet.neetcode.us");
+    expect(content).toEqual(fs.readFileSync("neet.js").toString());
   });
 });

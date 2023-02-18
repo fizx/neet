@@ -8,7 +8,7 @@ export class GithubLoader {
     const user = leftmost.split("-")[0];
     const repo = leftmost.split("-")[1];
 
-    const url = `https://raw.githubusercontent.com/${user}/${repo}/neet.js`;
+    const url = `https://raw.githubusercontent.com/${user}/${repo}/main/neet.js`;
     const response = await fetch(url);
     return response.text();
   }
