@@ -22,15 +22,14 @@ export interface Fetcher {
 
 export class GithubFetcher implements Fetcher {
   async load(host: string): Promise<string> {
-    let url = `https://raw.githubusercontent.com/fizx/neet/main/neet.js`;
-    try {
-      const leftmost = host.split(".")[0];
-      const user = leftmost.split("-")[0];
-      const repo = leftmost.split("-")[1];
-      url = `https://raw.githubusercontent.com/${user}/${repo}/main/neet.js`;
-    } catch (e) {
-      console.log("failed to parse host, using default");
+    const leftmost = host.split(".")[0];
+    let user = leftmost.split("-")[0];
+    let repo = leftmost.split("-")[1];
+    if (!repo) {
+      user = "fizx";
+      repo = "neet";
     }
+    const url = `https://raw.githubusercontent.com/${user}/${repo}/main/neet.js`;
     console.log(`fetching ${url}...`);
     const response = await fetch(url);
     if (!response.ok) {
