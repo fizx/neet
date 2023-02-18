@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+
+# Build files
+/dist
+/out
+/build
+
+# Vite cache
+.vite
+
+# Jest cache
+/.jest
+
+# ts-node-dev cache
+/.rts2_cache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Other
+.DS_Store
+*.log
