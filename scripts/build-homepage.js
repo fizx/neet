@@ -41,7 +41,10 @@ class StaticFileServer {
   }
 
   async serve(req) {
-    const filePath = path.join("/", req.url);
+    let filePath = req.url.split("?")[0];
+    if (filePath.startsWith("/")) {
+      filePath = filePath.substring(1);
+    }
     let currentNode = this.bundledDir;
     let contentType = "application/octet-stream";
     let content;
