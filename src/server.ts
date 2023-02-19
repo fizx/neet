@@ -27,21 +27,20 @@ export class Server {
       body: req.body,
     };
     try {
-      await ev.eval(
-        `module.exports.serve(${JSON.stringify(simple)});`,
-        (result) => {
-          if (typeof result === "object" && result !== null) {
-            const { status, headers, body } = result as {
-              status: number;
-              headers: Record<string, string>;
-              body: string;
-            };
-            res.status(status).set(headers).send(body);
-          } else {
-            res.status(500).send("Internal Server Error");
-          }
-        }
+      const rsp = await ev.eval(
+        `module.exports.serve(${JSON.stringify(simple)});`
       );
+
+      if (typeof rsp === "object" && rsp !== null) {
+        const { status, headers, body } = rsp as {
+          status: number;
+          headers: Record<string, string>;
+          body: string;
+        };
+        res.status(status).set(headers).send(body);
+      } else {
+        res.status(500).send("Internal Server Error");
+      }
     } catch (e) {
       console.error(e);
       res.status(500).send("Internal Server Error");
