@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NeetCode</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5em;
+      }
+
+      .header {
+        background-color: #1f2833;
+        color: #ffffff;
+        padding: 1em;
+        text-align: center;
+      }
+
+      .container {
+        margin: 2em auto;
+        padding: 2em;
+        max-width: 640px;
+        background-color: #ffffff;
+        border: 1px solid #e8e8e8;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      ol {
+        list-style-type: none;
+        counter-reset: list-counter;
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        position: relative;
+        margin: 0 0 1em 2em;
+        padding: 0 0 0.5em 1.5em;
+      }
+
+      li:before {
+        content: counter(list-counter) ". ";
+        counter-increment: list-counter;
+        position: absolute;
+        top: 0;
+        left: -1.5em;
+        color: #1f2833;
+        font-weight: bold;
+      }
+
+
+      h1 {
+        font-size: 2.5em;
+        margin: 0;
+      }
+
+      p {
+        margin: 1em 0;
+        font-size: 1.2em;
+      }
+
+      a {
+        color: #1f2833;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>NeetCode</h1>
+    </div>
+    <div class="container">
+      <p>NeetCode is a platform for developers to share and discover running code and apis. Whether you're a beginner or an experienced developer, NeetCode provides a community-driven platform for learning and collaboration.</p>
+      <p>Check out our <a href="https://github.com/fizx/neet">GitHub repository</a> to learn more and get involved.</p>
+      <p>To upload your code to NeetCode, follow these steps:</p>
+      <ol>
+        <li>Upload your code file to GitHub. For example, if your code is in a file called <code>neet.js</code> in a repository called <code>hello</code> owned by <code>you</code>, the URL would be: <a href="https://github.com/you/hello/neet.js">https://github.com/you/hello/neet.js</a>.</li>
+        <li>Once your code is uploaded, you can access it on NeetCode by visiting: <a href="https://hello-neet.neetcode.us">https://hello-neet.neetcode.us</a>.</li>
+      </ol>
+      <p>Make sure to replace the example <code>you</code>, <code>hello</code>, and <code>neet.js</code> with your actual GitHub username, repository name, and code file name.</p>
+
+      <p>This page is actually dynamically served from <a href="https://github.com/fizx/neet/blob/main/neet.js">https://github.com/fizx/neet/blob/main/neet.js</a>.</p>
+    </div>
+  </body>
+</html>
