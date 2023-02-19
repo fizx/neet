@@ -1,5 +1,5 @@
 
-const mime = require("mime-types");
+// const mime = require("mime-types");
 
 class StaticFileServer {
   constructor(bundledDir) {
@@ -22,7 +22,7 @@ class StaticFileServer {
 
     if (currentNode.content) {
       content = Buffer.from(currentNode.content, "base64");
-      contentType = currentNode.contentType || mime.contentType(path.extname(filePath));
+      contentType = currentNode.contentType;// || mime.contentType(path.extname(filePath));
     } else {
       content = JSON.stringify(currentNode);
       contentType = "application/json";
