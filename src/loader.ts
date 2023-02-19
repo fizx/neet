@@ -4,12 +4,14 @@ import {
   QuickJSContext,
   QuickJSWASMModule,
 } from "quickjs-emscripten";
-
-// eslint-disable-next-line
-type CB = (arg: any) => void;
+import fs from "fs/promises";
+import path from "path";
+import { CodeError, NotFound } from "./errors";
 
 export interface Evaluator {
-  eval(code: string, cb?: CB): Promise<void>;
+  close(): void;
+  // eslint-disable-next-line
+  eval(code: string): Promise<any>;
 }
 
 export interface Loader {
@@ -18,6 +20,21 @@ export interface Loader {
 
 export interface Fetcher {
   load(host: string): Promise<string>;
+}
+
+export class LocalFetcher implements Fetcher {
+  constructor(private root: string) {}
+
+  async load(host: string): Promise<string> {
+    const left = host.split(".")[0];
+    const file = path.join(this.root, left, "neet.js");
+
+    try {
+      return await fs.readFile(file, "utf8");
+    } catch (e) {
+      throw new NotFound(file);
+    }
+  }
 }
 
 export class GithubFetcher implements Fetcher {
@@ -33,8 +50,7 @@ export class GithubFetcher implements Fetcher {
     console.log(`fetching ${url}...`);
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`Failed to fetch ${url}`);
-      throw new Error(`Failed to fetch ${url}`);
+      throw new NotFound(`github.com/${user}/${repo}/neet.js`);
     }
     console.log(`fetched ${url}!`);
     return response.text();
@@ -47,53 +63,83 @@ export class QuickJSLoader implements Loader {
     this.quickJS = getQuickJS();
   }
   async load(host: string): Promise<Evaluator> {
+    const qjs = await this.quickJS;
     const content = await this.fetcher.load(host);
-    const evaluator = new QuickJSEvaluator(await this.quickJS, content);
+    const vm = qjs.newContext();
+    await this.eval(vm, "globalThis = this;module = {};" + content);
+    const serve = await this.eval(
+      vm,
+      "module.exports && module.exports.serve;"
+    );
+    if (!serve) {
+      throw new Error("Module must export a 'serve' function");
+    }
+    const evaluator = new QuickJSEvaluator(this, vm);
     return evaluator;
   }
-}
 
-export class QuickJSEvaluator implements Evaluator {
-  private vm: QuickJSContext;
-  constructor(private quickJS: QuickJSWASMModule, private content: string) {
-    this.vm = quickJS.newContext();
-    console.log("initializing quickjs evaluator...");
-    this.eval("globalThis = this;module = {};");
-    this.eval(this.content);
-    console.log("initialized quickjs evaluator!");
-    setInterval(() => {
-      if (this.vm.runtime.hasPendingJob()) {
-        this.vm.runtime.executePendingJobs();
+  executePendingJobs(vm: QuickJSContext) {
+    if (vm.runtime.alive) {
+      if (vm.runtime.hasPendingJob()) {
+        vm.runtime.executePendingJobs();
       }
-    }, 100);
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  async eval(code: string, cb?: CB) {
-    const result = this.vm.evalCode(code);
+  async eval(vm: QuickJSContext, code: string) {
+    const result = vm.evalCode(code);
 
     if (result.error) {
-      const err = new Error(JSON.stringify(this.vm.dump(result.error)));
+      const json = vm.dump(result.error);
       result.error.dispose();
-      throw err;
+      throw new CodeError(json);
     } else {
-      const p = this.vm.resolvePromise(result.value);
       try {
+        const p = vm.resolvePromise(result.value);
+        this.executePendingJobs(vm);
         const val = await p;
         if (val.error) {
-          const err = new Error(JSON.stringify(this.vm.dump(val.error)));
+          const err = new Error(JSON.stringify(vm.dump(val.error)));
           val.error.dispose();
           throw err;
         } else {
           try {
-            if (cb) cb(this.vm.dump(val.value));
+            return vm.dump(val.value);
           } finally {
             val.value.dispose();
           }
         }
+      } catch (e) {
+        console.log("what?", e);
       } finally {
         result.value.dispose();
       }
     }
+  }
+}
+
+export class QuickJSEvaluator implements Evaluator {
+  handle: NodeJS.Timer;
+  constructor(private loader: QuickJSLoader, private vm: QuickJSContext) {
+    this.handle = setInterval(this.executePendingJobs.bind(this), 10);
+  }
+
+  executePendingJobs() {
+    if (!this.loader.executePendingJobs(this.vm)) {
+      clearInterval(this.handle);
+    }
+  }
+
+  async eval(code: string) {
+    return this.loader.eval(this.vm, code);
+  }
+
+  close() {
+    this.vm.dispose();
+    clearInterval(this.handle);
   }
 }
 

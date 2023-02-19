@@ -10,3 +10,7 @@ export interface SimpleResponse {
   headers?: Record<string, string>;
   body: Buffer | Uint8Array | string;
 }
+
+export interface Service {
+  serve(req: SimpleRequest): Promise<SimpleResponse>;
+}
