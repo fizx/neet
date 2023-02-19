@@ -1,4 +1,4 @@
-import { LocalFetcher, QuickJSLoader } from "./loader";
+import { CachingLoader, LocalFetcher, QuickJSLoader } from "./loader";
 import path from "path";
 import { NotFound, CodeError } from "./errors";
 
@@ -42,5 +42,15 @@ describe("loading self", () => {
     await expect(loader.load("noserve.neetcode.us")).rejects.toThrow(
       "Module must export a 'serve' function"
     );
+  });
+
+  it("caches the evaluator", async () => {
+    const fetcher = new LocalFetcher(tests);
+    const loader = new CachingLoader(new QuickJSLoader(fetcher), 100);
+    const spy = jest.spyOn(fetcher, "fetch");
+    const evals = await loader.load("fizx-ping.neetcode.us");
+    const evals2 = await loader.load("fizx-ping.neetcode.us");
+    expect(evals).toBe(evals2);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });

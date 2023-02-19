@@ -19,13 +19,13 @@ export interface Loader {
 }
 
 export interface Fetcher {
-  load(host: string): Promise<string>;
+  fetch(host: string): Promise<string>;
 }
 
 export class LocalFetcher implements Fetcher {
   constructor(private root: string) {}
 
-  async load(host: string): Promise<string> {
+  async fetch(host: string): Promise<string> {
     const left = host.split(".")[0];
     const file = path.join(this.root, left, "neet.js");
 
@@ -38,7 +38,7 @@ export class LocalFetcher implements Fetcher {
 }
 
 export class GithubFetcher implements Fetcher {
-  async load(host: string): Promise<string> {
+  async fetch(host: string): Promise<string> {
     const leftmost = host.split(".")[0];
     let user = leftmost.split("-")[0];
     let repo = leftmost.split("-")[1];
@@ -64,7 +64,7 @@ export class QuickJSLoader implements Loader {
   }
   async load(host: string): Promise<Evaluator> {
     const qjs = await this.quickJS;
-    const content = await this.fetcher.load(host);
+    const content = await this.fetcher.fetch(host);
     const vm = qjs.newContext();
     await this.eval(vm, "globalThis = this;module = {};" + content);
     const serve = await this.eval(
