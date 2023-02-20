@@ -60,7 +60,7 @@ class StaticFileServer {
     if (currentNode.content) {
       content = Buffer.from(currentNode.content, "base64");
       contentType = currentNode.contentType;// || mime.contentType(path.extname(filePath));
-    } else if currentNode["index.html"]) {
+    } else if (currentNode["index.html"]) {
       currentNode = currentNode["index.html"];
       content = Buffer.from(currentNode.content, "base64");
       contentType = currentNode.contentType;// || mime.contentType(path.extname(filePath));
